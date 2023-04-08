@@ -92,7 +92,9 @@ contract Payment {
   Use DFS to find the shortest path between the two users
   */
 
-  function sendAmount(uint256 user_id_1, uint256 user_id_2, uint amount) public {
+  function sendAmount(uint256 user_id_1, uint256 user_id_2) public {
+    //Fix transaction amount
+    amount = 1 
     // Find the shortest path between the two users
     uint256[] memory path = dfs(user_id_1, user_id_2);
     // Check if the path exists

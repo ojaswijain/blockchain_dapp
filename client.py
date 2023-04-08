@@ -100,8 +100,7 @@ for edge in edges:
 for i in range(1000):
     fromUser = random.randint(0, 99)
     toUser = random.randint(0, 99)
-    amount = 1
-    txn_receipt = contract.functions.transfer(fromUser, toUser, amount).transact({'txType':"0x3", 'from':w3.eth.accounts[0], 'gas':2409638})
+    txn_receipt = contract.functions.transfer(fromUser, toUser).transact({'txType':"0x3", 'from':w3.eth.accounts[0], 'gas':2409638})
     txn_receipt_json = json.loads(w3.to_json(txn_receipt))
     print(txn_receipt_json) # print transaction hash
 
