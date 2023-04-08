@@ -9,7 +9,7 @@ w3 = Web3(provider)
 print(w3.is_connected())
 
 #replace the address with your contract address (!very important)
-deployed_contract_address = '0x8F046F919BA03C951C9E6c1A5439f6C62F7341bd'
+deployed_contract_address = '0xdEF3d09F922C82A8c6533986FAC30F7122e95487'
 
 #path of the contract json file. edit it with your contract json file
 compiled_contract_path ="build/contracts/Payment.json"
@@ -91,7 +91,7 @@ def power_law_graph(n, m):
 edges = power_law_graph(100, 5)
 
 for edge in edges:
-    amount = np.random.exponential(10)
+    amount = int(np.random.exponential(10))
     txn_receipt = contract.functions.createAcc(edge[0], edge[1], amount).transact({'txType':"0x3", 'from':w3.eth.accounts[0], 'gas':2409638})
     txn_receipt_json = json.loads(w3.to_json(txn_receipt))
     print(txn_receipt_json) # print transaction hash
@@ -100,7 +100,7 @@ for edge in edges:
 for i in range(1000):
     fromUser = random.randint(0, 99)
     toUser = random.randint(0, 99)
-    txn_receipt = contract.functions.transfer(fromUser, toUser).transact({'txType':"0x3", 'from':w3.eth.accounts[0], 'gas':2409638})
+    txn_receipt = contract.functions.sendAmount(fromUser, toUser).transact({'txType':"0x3", 'from':w3.eth.accounts[0], 'gas':2409638})
     txn_receipt_json = json.loads(w3.to_json(txn_receipt))
     print(txn_receipt_json) # print transaction hash
 
