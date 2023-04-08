@@ -9,7 +9,7 @@ w3 = Web3(provider)
 print(w3.is_connected())
 
 #replace the address with your contract address (!very important)
-deployed_contract_address = '0x399bF43b476233F9a5B08E2685F42F1EDB3faE47'
+deployed_contract_address = '0xDA67185a302DfDE73421E6428af80059B15b6e53'
 
 #path of the contract json file. edit it with your contract json file
 compiled_contract_path ="build/contracts/Payment.json"
@@ -101,16 +101,16 @@ for edge in edges:
 #Perform 1000 transactions between random users
 print("TRANSACTIONS")
 for i in range(1000):
-    fromUser = 0
-    toUser = 1
-    try:
-        txn_receipt = contract.functions.sendAmount(fromUser, toUser).transact({'txType':"0x3", 'from':w3.eth.accounts[0], 'gas':2409638})
-        txn_receipt_json = json.loads(w3.to_json(txn_receipt))
-        result = w3.eth.wait_for_transaction_receipt(txn_receipt_json)
-        print("Successful Txn")
-    except:
-        print("Failed Txn")        
+    fromUser = random.randint(0, 99)
+    toUser = random.randint(0, 99)
+    txn_receipt = contract.functions.sendAmount(fromUser, toUser).transact({'txType':"0x3", 'from':w3.eth.accounts[0], 'gas':2409638})
+    txn_receipt_json = json.loads(w3.to_json(txn_receipt))
+    result = w3.eth.wait_for_transaction_receipt(txn_receipt_json)
 
+    if(result.status == 0):
+        print("Failed Txn")
+    else:
+        print("Successful Txn")
     # print(txn_receipt_json) # print transaction hash
 
 #Close all accounts
