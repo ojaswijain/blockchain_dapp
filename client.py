@@ -9,7 +9,7 @@ w3 = Web3(provider)
 print(w3.is_connected())
 
 #replace the address with your contract address (!very important)
-deployed_contract_address = '0xdEF3d09F922C82A8c6533986FAC30F7122e95487'
+deployed_contract_address = '0x399bF43b476233F9a5B08E2685F42F1EDB3faE47'
 
 #path of the contract json file. edit it with your contract json file
 compiled_contract_path ="build/contracts/Payment.json"
@@ -39,7 +39,8 @@ print(w3.eth.get_transaction(txn_receipt_json))
 for i in range(100):
     txn_receipt = contract.functions.registerUser(i, "User"+str(i)).transact({'txType':"0x3", 'from':w3.eth.accounts[0], 'gas':2409638})
     txn_receipt_json = json.loads(w3.to_json(txn_receipt))
-    print(txn_receipt_json) # print transaction hash
+    result = w3.eth.wait_for_transaction_receipt(txn_receipt_json)
+    # print(txn_receipt_json) # print transaction hash
 
 #Create connected graph of 100 users following power law distribution
 
@@ -94,18 +95,28 @@ for edge in edges:
     amount = int(np.random.exponential(10))
     txn_receipt = contract.functions.createAcc(edge[0], edge[1], amount).transact({'txType':"0x3", 'from':w3.eth.accounts[0], 'gas':2409638})
     txn_receipt_json = json.loads(w3.to_json(txn_receipt))
-    print(txn_receipt_json) # print transaction hash
+    result = w3.eth.wait_for_transaction_receipt(txn_receipt_json)
+    # print(txn_receipt_json) # print transaction hash
 
 #Perform 1000 transactions between random users
+print("TRANSACTIONS")
 for i in range(1000):
-    fromUser = random.randint(0, 99)
-    toUser = random.randint(0, 99)
-    txn_receipt = contract.functions.sendAmount(fromUser, toUser).transact({'txType':"0x3", 'from':w3.eth.accounts[0], 'gas':2409638})
-    txn_receipt_json = json.loads(w3.to_json(txn_receipt))
-    print(txn_receipt_json) # print transaction hash
+    fromUser = 0
+    toUser = 1
+    try:
+        txn_receipt = contract.functions.sendAmount(fromUser, toUser).transact({'txType':"0x3", 'from':w3.eth.accounts[0], 'gas':2409638})
+        txn_receipt_json = json.loads(w3.to_json(txn_receipt))
+        result = w3.eth.wait_for_transaction_receipt(txn_receipt_json)
+        print("Successful Txn")
+    except:
+        print("Failed Txn")        
+
+    # print(txn_receipt_json) # print transaction hash
 
 #Close all accounts
+print("CLOSING ACCOUNTS")
 for edge in edges:
     txn_receipt = contract.functions.closeAcc(edge[0], edge[1]).transact({'txType':"0x3", 'from':w3.eth.accounts[0], 'gas':2409638})
     txn_receipt_json = json.loads(w3.to_json(txn_receipt))
-    print(txn_receipt_json) # print transaction hash
+    result = w3.eth.wait_for_transaction_receipt(txn_receipt_json)
+    # print(txn_receipt_json) # print transaction hash

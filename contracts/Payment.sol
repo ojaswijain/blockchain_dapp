@@ -48,12 +48,15 @@ contract Payment {
   // Depth-first search starting from a given node
   function dfs(uint256 start, uint256 end) public view returns (uint256[] memory) {
       bool[] memory visited = new bool[](userIDs.length);
+      for(uint256 i = 0; i < userIDs.length; i++){
+        visited[i] = false;
+      }
       uint256[] memory path = new uint256[](userIDs.length);
       uint256 pathIndex = 0;
-      bool pathFound = dfsHelper(start, end, visited, path, pathIndex);
-      if (pathFound) {
-          uint256[] memory result = new uint256[](pathIndex);
-          for (uint256 i = 0; i < pathIndex; i++) {
+      uint256 pathFound = dfsHelper(start, end, visited, path, pathIndex);
+      if (pathFound > 0) {
+          uint256[] memory result = new uint256[](pathFound);
+          for (uint256 i = 0; i < pathFound; i++) {
               result[i] = path[i];
           }
           return result;
@@ -63,23 +66,23 @@ contract Payment {
   }
 
   // Recursive helper function for DFS
-  function dfsHelper(uint256 node, uint256 end, bool[] memory visited, uint256[] memory path, uint256 pathIndex) private view returns (bool) {
+  function dfsHelper(uint256 node, uint256 end, bool[] memory visited, uint256[] memory path, uint256 pathIndex) private view returns (uint256) {
       visited[node] = true;
       path[pathIndex] = node;
       pathIndex++;
       if (node == end) {
-          return true;
+          return pathIndex;
       }
       for (uint256 i = 0; i < adjList[node].length; i++) {
           uint256 neighbor = adjList[node][i];
-          if (!visited[neighbor]) {
-              bool pathFound = dfsHelper(neighbor, end, visited, path, pathIndex);
-              if (pathFound) {
-                  return true;
+          if (visited[neighbor] == false) {
+              uint256 pathFound = dfsHelper(neighbor, end, visited, path, pathIndex);
+              if (pathFound>0) {
+                  return pathFound;
               }
           }
       }
-      return false;
+      return 0;
   }
 
   /* Function sendAmount()
@@ -92,7 +95,7 @@ contract Payment {
   Use DFS to find the shortest path between the two users
   */
 
-  function sendAmount(uint256 user_id_1, uint256 user_id_2) public {
+  function sendAmount(uint256 user_id_1, uint256 user_id_2) public returns (bool){
     //Fix transaction amount
     uint256 amount = 1; 
     // Find the shortest path between the two users
@@ -108,6 +111,8 @@ contract Payment {
       accounts[path[i]][path[i + 1]].balance_1 -= amount;
       accounts[path[i]][path[i + 1]].balance_2 += amount;
     }
+
+    return true;
   }
 
   /* Function closeAcc()
@@ -136,4 +141,3 @@ contract Payment {
     delete accounts[user_id_1][user_id_2];
   }
 }
-
