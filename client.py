@@ -105,7 +105,7 @@ for i in range(1000):
     print(txn_receipt_json) # print transaction hash
 
 #Close all accounts
-for i in range(100):
-    txn_receipt = contract.functions.closeAcc(i).transact({'txType':"0x3", 'from':w3.eth.accounts[0], 'gas':2409638})
+for edge in edges:
+    txn_receipt = contract.functions.closeAcc(edge[0], edge[1]).transact({'txType':"0x3", 'from':w3.eth.accounts[0], 'gas':2409638})
     txn_receipt_json = json.loads(w3.to_json(txn_receipt))
     print(txn_receipt_json) # print transaction hash
