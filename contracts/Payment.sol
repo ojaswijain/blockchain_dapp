@@ -37,9 +37,11 @@ contract Payment {
   mapping(uint256 => mapping(uint256 => Account)) public accounts;
   mapping(uint256 => uint256[]) public adjList;
 
-  function createAcc(uint256 user_id_1, uint256 user_id_2, uint amount) public {
+  function createAcc(uint256 user_id_1, uint256 user_id_2, uint256 amount) public {
     // Create a new account and add to the mapping and account IDs list
-    accounts[user_id_1][user_id_2] = Account(user_id_1, user_id_2, amount/2, amount/2);
+    uint256 amountby2 = amount/2;
+    accounts[user_id_1][user_id_2] = Account(user_id_1, user_id_2, amountby2, amountby2);
+    accounts[user_id_2][user_id_1] = Account(user_id_2, user_id_1, amountby2, amountby2);
     // Add the two users to each other's adjacency list
     adjList[user_id_1].push(user_id_2);
     adjList[user_id_2].push(user_id_1);
@@ -103,6 +105,7 @@ contract Payment {
     // Check if the path exists
     require(path.length != 0, "No path exists");
     // Check if the users on the path have sufficient balance
+    require(path[path.length - 1] == user_id_2, "Wrong Path");
     for (uint256 i = 0; i < path.length - 1; i++) {
       require(accounts[path[i]][path[i + 1]].balance_1 >= amount, "Insufficient balance");
     }
@@ -110,6 +113,8 @@ contract Payment {
     for (uint256 i = 0; i < path.length - 1; i++) {
       accounts[path[i]][path[i + 1]].balance_1 -= amount;
       accounts[path[i]][path[i + 1]].balance_2 += amount;
+      accounts[path[i + 1]][path[i]].balance_1 += amount;
+      accounts[path[i + 1]][path[i]].balance_2 -= amount;
     }
 
     return true;
@@ -139,5 +144,6 @@ contract Payment {
     }
     // Remove the account from the mapping
     delete accounts[user_id_1][user_id_2];
+    delete accounts[user_id_2][user_id_1];
   }
 }

@@ -1,15 +1,16 @@
 import json
 from web3 import Web3
+from math import ceil
 
 
 #connect to the local ethereum blockchain
-provider = Web3.HTTPProvider('http://127.0.0.1:8545')
+provider = Web3.HTTPProvider('http://127.0.0.1:8545', request_kwargs = {'timeout': 10000000})
 w3 = Web3(provider)
 #check if ethereum is connected
 print(w3.is_connected())
 
 #replace the address with your contract address (!very important)
-deployed_contract_address = '0xDA67185a302DfDE73421E6428af80059B15b6e53'
+deployed_contract_address = '0xEBbfA8C6cE34f1dB9B60aA9ddDC3428838CAC5A3'
 
 #path of the contract json file. edit it with your contract json file
 compiled_contract_path ="build/contracts/Payment.json"
@@ -91,8 +92,9 @@ def power_law_graph(n, m):
 #for each edge in the graph, call the contract function createAcc(uint,uint,uint)
 edges = power_law_graph(100, 5)
 
+print("CREATING ACCOUNTS")
 for edge in edges:
-    amount = int(np.random.exponential(10))
+    amount = ceil(np.random.exponential(10)) + 1
     txn_receipt = contract.functions.createAcc(edge[0], edge[1], amount).transact({'txType':"0x3", 'from':w3.eth.accounts[0], 'gas':2409638})
     txn_receipt_json = json.loads(w3.to_json(txn_receipt))
     result = w3.eth.wait_for_transaction_receipt(txn_receipt_json)
@@ -100,18 +102,20 @@ for edge in edges:
 
 #Perform 1000 transactions between random users
 print("TRANSACTIONS")
-for i in range(1000):
-    fromUser = random.randint(0, 99)
-    toUser = random.randint(0, 99)
-    txn_receipt = contract.functions.sendAmount(fromUser, toUser).transact({'txType':"0x3", 'from':w3.eth.accounts[0], 'gas':2409638})
-    txn_receipt_json = json.loads(w3.to_json(txn_receipt))
-    result = w3.eth.wait_for_transaction_receipt(txn_receipt_json)
-
-    if(result.status == 0):
-        print("Failed Txn")
-    else:
-        print("Successful Txn")
-    # print(txn_receipt_json) # print transaction hash
+for j in range(10):
+    successfulcount = 0
+    for i in range(100):
+        fromUser = random.randint(0, 99)
+        toUser = random.randint(0, 99)
+        while(toUser == fromUser):
+            toUser = random.randint(0, 99)
+        txn_receipt = contract.functions.sendAmount(fromUser, toUser).transact({'txType':"0x3", 'from':w3.eth.accounts[0], 'gas':2409638})
+        txn_receipt_json = json.loads(w3.to_json(txn_receipt))
+        result = w3.eth.wait_for_transaction_receipt(txn_receipt_json)
+        if(result.status == 1):    
+            successfulcount += 1
+        # print(txn_receipt_json) # print transaction hash
+    print(j+1, successfulcount)
 
 #Close all accounts
 print("CLOSING ACCOUNTS")
