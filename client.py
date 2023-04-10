@@ -10,7 +10,7 @@ w3 = Web3(provider)
 print(w3.is_connected())
 
 #replace the address with your contract address (!very important)
-deployed_contract_address = '0x42b6CED6e02F5fccF3ca2414968a54F59b1aAEc0'
+deployed_contract_address = '0x079cec3332F9610F13c377B63DeFb3e9f407b1ce'
 
 #path of the contract json file. edit it with your contract json file
 compiled_contract_path ="build/contracts/Payment.json"
@@ -91,9 +91,9 @@ def power_law_graph(n, m):
     return edges
 
 #for each edge in the graph, call the contract function createAcc(uint,uint,uint)
-# edges = power_law_graph(users, users//5)
-G = nx.barabasi_albert_graph(users,users//5)
-edges = G.edges()
+edges = power_law_graph(users, users//5)
+# G = nx.barabasi_albert_graph(users,users//5)
+# edges = G.edges()
 print(edges)
 # def dfs(start, end, adjlist):
 #     visited = []
