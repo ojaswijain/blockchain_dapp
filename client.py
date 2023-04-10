@@ -4,13 +4,13 @@ from math import ceil
 
 
 #connect to the local ethereum blockchain
-provider = Web3.HTTPProvider('http://127.0.0.1:8545', request_kwargs = {'timeout': 10000000})
+provider = Web3.HTTPProvider('http://127.0.0.1:8545', request_kwargs = {'timeout': 100})
 w3 = Web3(provider)
 #check if ethereum is connected
 print(w3.is_connected())
 
 #replace the address with your contract address (!very important)
-deployed_contract_address = '0xEBbfA8C6cE34f1dB9B60aA9ddDC3428838CAC5A3'
+deployed_contract_address = '0xbE16fFaf23B73222fc6d37E5b6C5DDE827D95Dc5'
 
 #path of the contract json file. edit it with your contract json file
 compiled_contract_path ="build/contracts/Payment.json"
@@ -35,9 +35,10 @@ print(w3.eth.get_transaction(txn_receipt_json))
 '''
 
 #Add your Code here
-
+users = 10
+txn = 100
 #Initialise 100 users using contract function registerUser(uint, str)
-for i in range(100):
+for i in range(users):
     txn_receipt = contract.functions.registerUser(i, "User"+str(i)).transact({'txType':"0x3", 'from':w3.eth.accounts[0], 'gas':2409638})
     txn_receipt_json = json.loads(w3.to_json(txn_receipt))
     result = w3.eth.wait_for_transaction_receipt(txn_receipt_json)
@@ -90,7 +91,7 @@ def power_law_graph(n, m):
     return edges
 
 #for each edge in the graph, call the contract function createAcc(uint,uint,uint)
-edges = power_law_graph(100, 5)
+edges = power_law_graph(users, users//5)
 
 print("CREATING ACCOUNTS")
 for edge in edges:
@@ -104,11 +105,11 @@ for edge in edges:
 print("TRANSACTIONS")
 for j in range(10):
     successfulcount = 0
-    for i in range(100):
-        fromUser = random.randint(0, 99)
-        toUser = random.randint(0, 99)
+    for i in range(txn//10):
+        fromUser = random.randint(0, users)
+        toUser = random.randint(0, users)
         while(toUser == fromUser):
-            toUser = random.randint(0, 99)
+            toUser = random.randint(0, users)
         txn_receipt = contract.functions.sendAmount(fromUser, toUser).transact({'txType':"0x3", 'from':w3.eth.accounts[0], 'gas':2409638})
         txn_receipt_json = json.loads(w3.to_json(txn_receipt))
         result = w3.eth.wait_for_transaction_receipt(txn_receipt_json)
