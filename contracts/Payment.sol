@@ -48,44 +48,95 @@ contract Payment {
   }
 
   // Depth-first search starting from a given node
-  function dfs(uint256 start, uint256 end) public view returns (uint256[] memory) {
-      bool[] memory visited = new bool[](userIDs.length);
-      for(uint256 i = 0; i < userIDs.length; i++){
+  function bfs(uint256 start, uint256 end) public view returns (uint256[] memory) {
+    bool[] memory visited = new bool[](userIDs.length);
+    for (uint256 i = 0; i < userIDs.length; i++) {
         visited[i] = false;
-      }
-      uint256[] memory path = new uint256[](userIDs.length);
-      uint256 pathIndex = 0;
-      uint256 pathFound = dfsHelper(start, end, visited, path, pathIndex);
-      if (pathFound > 0) {
-          uint256[] memory result = new uint256[](pathFound);
-          for (uint256 i = 0; i < pathFound; i++) {
-              result[i] = path[i];
-          }
-          return result;
-      } else {
-          return new uint256[](0);
-      }
+    }
+    uint256[] memory parent = new uint256[](userIDs.length);
+    for (uint256 i = 0; i < userIDs.length; i++) {
+        parent[i] = userIDs.length + 1; // initialize all parent nodes to an invalid value
+    }
+    parent[start] = userIDs.length; // mark the starting node as the root of the BFS tree
+    visited[start] = true;
+    uint256[] memory queue = new uint256[](userIDs.length);
+    uint256 front = 0;
+    uint256 rear = 0;
+    queue[rear] = start;
+    rear++;
+    while (front < rear) {
+        uint256 node = queue[front];
+        front++;
+        if (node == end) {
+            break; // we have found the shortest path
+        }
+        for (uint256 i = 0; i < adjList[node].length; i++) {
+            uint256 neighbor = adjList[node][i];
+            if (visited[neighbor] == false) {
+                visited[neighbor] = true;
+                parent[neighbor] = node;
+                queue[rear] = neighbor;
+                rear++;
+            }
+        }
+    }
+    if (parent[end] != userIDs.length + 1) { // we have found a path to the end node
+        uint256[] memory path = new uint256[](userIDs.length);
+        uint256 pathIndex = 0;
+        uint256 curr = end;
+        while (curr != userIDs.length) {
+            path[pathIndex] = curr;
+            pathIndex++;
+            curr = parent[curr];
+        }
+        uint256[] memory result = new uint256[](pathIndex);
+        for (uint256 i = 0; i < pathIndex; i++) {
+            result[i] = path[pathIndex - i - 1];
+        }
+        return result;
+    } else {
+        return new uint256[](0); // no path was found
+    }
   }
 
-  // Recursive helper function for DFS
-  function dfsHelper(uint256 node, uint256 end, bool[] memory visited, uint256[] memory path, uint256 pathIndex) private view returns (uint256) {
-      visited[node] = true;
-      path[pathIndex] = node;
-      pathIndex++;
-      if (node == end) {
-          return pathIndex;
-      }
-      for (uint256 i = 0; i < adjList[node].length; i++) {
-          uint256 neighbor = adjList[node][i];
-          if (visited[neighbor] == false) {
-              uint256 pathFound = dfsHelper(neighbor, end, visited, path, pathIndex);
-              if (pathFound>0) {
-                  return pathFound;
-              }
-          }
-      }
-      return 0;
-  }
+  // function dfs(uint256 start, uint256 end) public view returns (uint256[] memory) {
+  //     bool[] memory visited = new bool[](userIDs.length);
+  //     for(uint256 i = 0; i < userIDs.length; i++){
+  //       visited[i] = false;
+  //     }
+  //     uint256[] memory path = new uint256[](userIDs.length);
+  //     uint256 pathIndex = 0;
+  //     uint256 pathFound = dfsHelper(start, end, visited, path, pathIndex);
+  //     if (pathFound > 0) {
+  //         uint256[] memory result = new uint256[](pathFound);
+  //         for (uint256 i = 0; i < pathFound; i++) {
+  //             result[i] = path[i];
+  //         }
+  //         return result;
+  //     } else {
+  //         return new uint256[](0);
+  //     }
+  // }
+
+  // // Recursive helper function for DFS
+  // function dfsHelper(uint256 node, uint256 end, bool[] memory visited, uint256[] memory path, uint256 pathIndex) private view returns (uint256) {
+  //     visited[node] = true;
+  //     path[pathIndex] = node;
+  //     pathIndex++;
+  //     if (node == end) {
+  //         return pathIndex;
+  //     }
+  //     for (uint256 i = 0; i < adjList[node].length; i++) {
+  //         uint256 neighbor = adjList[node][i];
+  //         if (visited[neighbor] == false) {
+  //             uint256 pathFound = dfsHelper(neighbor, end, visited, path, pathIndex);
+  //             if (pathFound>0) {
+  //                 return pathFound;
+  //             }
+  //         }
+  //     }
+  //     return 0;
+  // }
 
   /* Function sendAmount()
   @param user_id_1: user id of sender
@@ -101,7 +152,7 @@ contract Payment {
     //Fix transaction amount
     uint256 amount = 1; 
     // Find the shortest path between the two users
-    uint256[] memory path = dfs(user_id_1, user_id_2);
+    uint256[] memory path = bfs(user_id_1, user_id_2);
     // Check if the path exists
     require(path.length != 0, "No path exists");
     // Check if the users on the path have sufficient balance
@@ -119,7 +170,6 @@ contract Payment {
 
     return true;
   }
-
   /* Function closeAcc()
   @param user_id_1: user id of first user
   @param user_id_2: user id of second user

@@ -1,7 +1,7 @@
 import json
 from web3 import Web3
 from math import ceil
-
+import networkx as nx
 
 #connect to the local ethereum blockchain
 provider = Web3.HTTPProvider('http://127.0.0.1:8545', request_kwargs = {'timeout': 100})
@@ -10,7 +10,7 @@ w3 = Web3(provider)
 print(w3.is_connected())
 
 #replace the address with your contract address (!very important)
-deployed_contract_address = '0xbE16fFaf23B73222fc6d37E5b6C5DDE827D95Dc5'
+deployed_contract_address = '0x42b6CED6e02F5fccF3ca2414968a54F59b1aAEc0'
 
 #path of the contract json file. edit it with your contract json file
 compiled_contract_path ="build/contracts/Payment.json"
@@ -35,11 +35,11 @@ print(w3.eth.get_transaction(txn_receipt_json))
 '''
 
 #Add your Code here
-users = 10
-txn = 100
+users = 100
+txn = 1000
 #Initialise 100 users using contract function registerUser(uint, str)
 for i in range(users):
-    txn_receipt = contract.functions.registerUser(i, "User"+str(i)).transact({'txType':"0x3", 'from':w3.eth.accounts[0], 'gas':2409638})
+    txn_receipt = contract.functions.registerUser(i, "User"+str(i)).transact({'txType':"0x3", 'from':w3.eth.accounts[0], 'gas':12500000})
     txn_receipt_json = json.loads(w3.to_json(txn_receipt))
     result = w3.eth.wait_for_transaction_receipt(txn_receipt_json)
     # print(txn_receipt_json) # print transaction hash
@@ -91,12 +91,55 @@ def power_law_graph(n, m):
     return edges
 
 #for each edge in the graph, call the contract function createAcc(uint,uint,uint)
-edges = power_law_graph(users, users//5)
+# edges = power_law_graph(users, users//5)
+G = nx.barabasi_albert_graph(users,users//5)
+edges = G.edges()
+print(edges)
+# def dfs(start, end, adjlist):
+#     visited = []
+#     path = []
+#     for i in range(1000):
+#         visited.append(False)
+#         path.append(0)
+#     pathIndex = 0
+#     pathIndex = dfshelper(start, end, visited, adjlist, path, pathIndex)
+
+#     return pathIndex
+
+# def dfshelper(node, end, visited, adjlist, path, pathIndex):
+#     visited[node] = True
+#     path[pathIndex] = node
+#     pathIndex+=1
+
+#     if(node == end):
+#         return pathIndex
+    
+#     for neighbor in adjlist[node]:
+#         if visited[neighbor] == False:
+#             pathFound = dfshelper(neighbor, end, visited, adjlist, path, pathIndex)
+#             if pathFound > 0:
+#                 return pathFound
+    
+#     return 0
+# adjlist={new_list: [] for new_list in range(100)}
+# for i in range(100):
+#     adjlist[i] = []
+
+# for edge in edges:
+#     adjlist[edge[0]].append(edge[1])
+#     adjlist[edge[1]].append(edge[0])
+
+# for j in range(10):
+#     fromUser = random.randint(0, users)
+#     toUser = random.randint(0, users)
+
+#     pathlength = dfs(fromUser, toUser, adjlist)
+#     print(pathlength)
 
 print("CREATING ACCOUNTS")
 for edge in edges:
-    amount = ceil(np.random.exponential(10)) + 1
-    txn_receipt = contract.functions.createAcc(edge[0], edge[1], amount).transact({'txType':"0x3", 'from':w3.eth.accounts[0], 'gas':2409638})
+    amount = int(np.random.exponential(10))
+    txn_receipt = contract.functions.createAcc(edge[0], edge[1], amount).transact({'txType':"0x3", 'from':w3.eth.accounts[0], 'gas':12500000})
     txn_receipt_json = json.loads(w3.to_json(txn_receipt))
     result = w3.eth.wait_for_transaction_receipt(txn_receipt_json)
     # print(txn_receipt_json) # print transaction hash
@@ -106,11 +149,12 @@ print("TRANSACTIONS")
 for j in range(10):
     successfulcount = 0
     for i in range(txn//10):
+        # print(i)
         fromUser = random.randint(0, users)
         toUser = random.randint(0, users)
         while(toUser == fromUser):
             toUser = random.randint(0, users)
-        txn_receipt = contract.functions.sendAmount(fromUser, toUser).transact({'txType':"0x3", 'from':w3.eth.accounts[0], 'gas':2409638})
+        txn_receipt = contract.functions.sendAmount(fromUser, toUser).transact({'txType':"0x3", 'from':w3.eth.accounts[0], 'gas':12500000})
         txn_receipt_json = json.loads(w3.to_json(txn_receipt))
         result = w3.eth.wait_for_transaction_receipt(txn_receipt_json)
         if(result.status == 1):    
@@ -121,7 +165,7 @@ for j in range(10):
 #Close all accounts
 print("CLOSING ACCOUNTS")
 for edge in edges:
-    txn_receipt = contract.functions.closeAcc(edge[0], edge[1]).transact({'txType':"0x3", 'from':w3.eth.accounts[0], 'gas':2409638})
+    txn_receipt = contract.functions.closeAcc(edge[0], edge[1]).transact({'txType':"0x3", 'from':w3.eth.accounts[0], 'gas':12500000})
     txn_receipt_json = json.loads(w3.to_json(txn_receipt))
     result = w3.eth.wait_for_transaction_receipt(txn_receipt_json)
     # print(txn_receipt_json) # print transaction hash
