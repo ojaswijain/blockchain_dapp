@@ -1,7 +1,7 @@
 # Blockchain DAPP
 
 Simple blockchain dapp \
-Using Solidity, Truffle, Ganache and Web3 \
+Using Solidity, Truffle, Ganache and Web3 
 
 ## Installation
 
@@ -13,7 +13,7 @@ pip install web3
 
 ### Start Ganache
 
-    $ganache-cli
+    $ganache -l 8000000
 
 ### Compile and migrate contracts
 
