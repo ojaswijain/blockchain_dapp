@@ -5,9 +5,9 @@ Using Solidity, Truffle, Ganache and Web3
 
 ## Installation
 
-npm install -g truffle
-npm install -g ganache-cli
-pip install web3
+    $npm install -g truffle
+    $npm install -g ganache-cli
+    $pip install web3
 
 ## Usage
 
@@ -24,7 +24,7 @@ At this point, copy the contract address from the output of the `truffle migrate
 
 ### Run client
 
-    python client.py
+    $python client.py
 
 
 
