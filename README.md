@@ -13,7 +13,7 @@ Using Solidity, Truffle, Ganache and Web3
 
 ### Start Ganache
 
-    $ganache -l 8000000
+    $ganache -l 12500000
 
 ### Compile and migrate contracts
 
