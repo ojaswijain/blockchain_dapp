@@ -20,7 +20,7 @@ pip install web3
     $truffle compile
     $truffle migrate
 
-    At this point, copy the contract address from the output of the `truffle migrate` command and paste it into the `client.py` file.
+At this point, copy the contract address from the output of the `truffle migrate` command and paste it into the `client.py` file.
 
 ### Run client
 
