@@ -10,7 +10,7 @@ w3 = Web3(provider)
 print(w3.is_connected())
 
 #replace the address with your contract address (!very important)
-deployed_contract_address = '0x079cec3332F9610F13c377B63DeFb3e9f407b1ce'
+deployed_contract_address = '0xa5388a71b833CED0CE8d3aA4bdbC76D3A204bF7f'
 
 #path of the contract json file. edit it with your contract json file
 compiled_contract_path ="build/contracts/Payment.json"
@@ -18,8 +18,6 @@ with open(compiled_contract_path) as file:
     contract_json = json.load(file)
     contract_abi = contract_json['abi']
 contract = w3.eth.contract(address = deployed_contract_address, abi = contract_abi)
-
-
 
 '''
 #Calling a contract function createAcc(uint,uint,uint)
@@ -42,7 +40,6 @@ for i in range(users):
     txn_receipt = contract.functions.registerUser(i, "User"+str(i)).transact({'txType':"0x3", 'from':w3.eth.accounts[0], 'gas':12500000})
     txn_receipt_json = json.loads(w3.to_json(txn_receipt))
     result = w3.eth.wait_for_transaction_receipt(txn_receipt_json)
-    # print(txn_receipt_json) # print transaction hash
 
 #Create connected graph of 100 users following power law distribution
 
@@ -91,50 +88,7 @@ def power_law_graph(n, m):
     return edges
 
 #for each edge in the graph, call the contract function createAcc(uint,uint,uint)
-edges = power_law_graph(users, users//5)
-# G = nx.barabasi_albert_graph(users,users//5)
-# edges = G.edges()
-print(edges)
-# def dfs(start, end, adjlist):
-#     visited = []
-#     path = []
-#     for i in range(1000):
-#         visited.append(False)
-#         path.append(0)
-#     pathIndex = 0
-#     pathIndex = dfshelper(start, end, visited, adjlist, path, pathIndex)
-
-#     return pathIndex
-
-# def dfshelper(node, end, visited, adjlist, path, pathIndex):
-#     visited[node] = True
-#     path[pathIndex] = node
-#     pathIndex+=1
-
-#     if(node == end):
-#         return pathIndex
-    
-#     for neighbor in adjlist[node]:
-#         if visited[neighbor] == False:
-#             pathFound = dfshelper(neighbor, end, visited, adjlist, path, pathIndex)
-#             if pathFound > 0:
-#                 return pathFound
-    
-#     return 0
-# adjlist={new_list: [] for new_list in range(100)}
-# for i in range(100):
-#     adjlist[i] = []
-
-# for edge in edges:
-#     adjlist[edge[0]].append(edge[1])
-#     adjlist[edge[1]].append(edge[0])
-
-# for j in range(10):
-#     fromUser = random.randint(0, users)
-#     toUser = random.randint(0, users)
-
-#     pathlength = dfs(fromUser, toUser, adjlist)
-#     print(pathlength)
+edges = power_law_graph(users, 5)
 
 print("CREATING ACCOUNTS")
 for edge in edges:
@@ -142,7 +96,6 @@ for edge in edges:
     txn_receipt = contract.functions.createAcc(edge[0], edge[1], amount).transact({'txType':"0x3", 'from':w3.eth.accounts[0], 'gas':12500000})
     txn_receipt_json = json.loads(w3.to_json(txn_receipt))
     result = w3.eth.wait_for_transaction_receipt(txn_receipt_json)
-    # print(txn_receipt_json) # print transaction hash
 
 #Perform 1000 transactions between random users
 print("TRANSACTIONS")
@@ -159,7 +112,6 @@ for j in range(10):
         result = w3.eth.wait_for_transaction_receipt(txn_receipt_json)
         if(result.status == 1):    
             successfulcount += 1
-        # print(txn_receipt_json) # print transaction hash
     print(j+1, successfulcount)
 
 #Close all accounts
@@ -168,4 +120,4 @@ for edge in edges:
     txn_receipt = contract.functions.closeAcc(edge[0], edge[1]).transact({'txType':"0x3", 'from':w3.eth.accounts[0], 'gas':12500000})
     txn_receipt_json = json.loads(w3.to_json(txn_receipt))
     result = w3.eth.wait_for_transaction_receipt(txn_receipt_json)
-    # print(txn_receipt_json) # print transaction hash
+

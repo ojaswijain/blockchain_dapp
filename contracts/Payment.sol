@@ -99,45 +99,6 @@ contract Payment {
     }
   }
 
-  // function dfs(uint256 start, uint256 end) public view returns (uint256[] memory) {
-  //     bool[] memory visited = new bool[](userIDs.length);
-  //     for(uint256 i = 0; i < userIDs.length; i++){
-  //       visited[i] = false;
-  //     }
-  //     uint256[] memory path = new uint256[](userIDs.length);
-  //     uint256 pathIndex = 0;
-  //     uint256 pathFound = dfsHelper(start, end, visited, path, pathIndex);
-  //     if (pathFound > 0) {
-  //         uint256[] memory result = new uint256[](pathFound);
-  //         for (uint256 i = 0; i < pathFound; i++) {
-  //             result[i] = path[i];
-  //         }
-  //         return result;
-  //     } else {
-  //         return new uint256[](0);
-  //     }
-  // }
-
-  // // Recursive helper function for DFS
-  // function dfsHelper(uint256 node, uint256 end, bool[] memory visited, uint256[] memory path, uint256 pathIndex) private view returns (uint256) {
-  //     visited[node] = true;
-  //     path[pathIndex] = node;
-  //     pathIndex++;
-  //     if (node == end) {
-  //         return pathIndex;
-  //     }
-  //     for (uint256 i = 0; i < adjList[node].length; i++) {
-  //         uint256 neighbor = adjList[node][i];
-  //         if (visited[neighbor] == false) {
-  //             uint256 pathFound = dfsHelper(neighbor, end, visited, path, pathIndex);
-  //             if (pathFound>0) {
-  //                 return pathFound;
-  //             }
-  //         }
-  //     }
-  //     return 0;
-  // }
-
   /* Function sendAmount()
   @param user_id_1: user id of sender
   @param user_id_2: user id of receiver
@@ -145,7 +106,7 @@ contract Payment {
   Default amount is 1
   If user doesn’t have sufficient balance, reject transaction
   Check balance of all users on path before transferring amount
-  Use DFS to find the shortest path between the two users
+  Use BFS to find the shortest path between the two users
   */
 
   function sendAmount(uint256 user_id_1, uint256 user_id_2) public returns (bool){
